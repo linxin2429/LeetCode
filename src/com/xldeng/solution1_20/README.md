@@ -424,3 +424,65 @@ public class Solution10 {
     }
 }
 ```
+
+11 [盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
+暴力求解
+```java
+public class Solution {
+    public int maxArea(int[] height) {
+        int length = height.length;
+        int maxArea = 0;
+        int currentArea = 0;
+        for (int i = 0; i < length - 1; i++) {
+            for (int j = i + 1; j < length; j++) {
+                currentArea = Math.min(height[i],height[j]) * (j - i);
+                if (currentArea > maxArea){
+                    maxArea = currentArea;
+                }
+            }
+        }
+        return maxArea;
+    }
+}
+```
+双指针
+```java
+public class Solution {
+    public int maxArea(int[] height) {
+        int len = height.length;
+        int m = 0, n = len - 1;
+        int maxArea = 0;
+        int currentArea = 0;
+        while (n > m){
+            currentArea = (n - m) * Math.min(height[m],height[n]);
+            if (currentArea > maxArea ){
+                maxArea = currentArea;
+            }
+            if(height[m] > height[n]){
+                n--;
+            } else {
+                m++;
+            }
+        }
+        return maxArea;
+    }
+}
+```
+# 12 [整数转罗马数字](https://leetcode-cn.com/problems/integer-to-roman/)
+贪心
+```java
+public class Solution {
+    public String intToRoman(int num) {
+        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        String[] romans = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        StringBuilder roman = new StringBuilder();
+        for (int i = 0; i < values.length && num != 0; i++) {
+            while (num > values[i]) {
+                num -= values[i];
+                roman.append(romans[i]);
+            }
+        }
+        return roman.toString();
+    }
+}
+```
