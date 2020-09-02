@@ -486,3 +486,153 @@ public class Solution {
     }
 }
 ```
+# 13 [罗马数字转整数](https://leetcode-cn.com/problems/roman-to-integer/)
+```java
+public class Solution {
+    private int getValue(char ch) {
+        switch(ch) {
+            case 'I': return 1;
+            case 'V': return 5;
+            case 'X': return 10;
+            case 'L': return 50;
+            case 'C': return 100;
+            case 'D': return 500;
+            case 'M': return 1000;
+            default: return 0;
+        }
+    }
+    public int romanToInt(String s) {
+        int preNum = getValue(s.charAt(0));
+        int len = s.length();
+        int value = 0;
+        int currNum;
+        for (int i = 1; i < len; i++) {
+            currNum = getValue(s.charAt(i));
+            if (preNum >= currNum){
+                value += preNum;
+            } else {
+                value -= preNum;
+            }
+            preNum = currNum;
+        }
+        return value + preNum;
+    }
+}
+```
+
+# 14 [最长公共前缀](https://leetcode-cn.com/problems/longest-common-prefix/)
+```java
+public class Solution {
+    public String longestCommonPrefix(String[] strs) {
+        int len = strs.length;
+        if (len == 0 ){
+            return "";
+        }
+        // 以strs[0]为基准，遍历其他字符串，比较对应位置的字符是否相同，不同则退出循环，找到公共前缀
+        String ans = strs[0];
+        for (int i = 1; i < len; i++) {
+            int j = 0;
+            for (; j < ans.length() && j < strs[i].length(); j++) {
+                if (ans.charAt(j) != strs[i].charAt(j)){
+                    break;
+                }
+            }
+            ans = ans.substring(0,j);
+            if ("".equals(ans)){
+                return "";
+            }
+        }
+        return ans;
+    }
+}
+```
+
+# 15 [三数之和](https://leetcode-cn.com/problems/3sum/)
+经典题，排序+双指针
+```java
+public class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        int len = nums.length;
+        // 排序
+        Arrays.sort(nums);
+        List<List<Integer>> lists = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            // 每次a都不相同
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int k = len - 1;
+            // b+c目标值
+            int target = -nums[i];
+            for (int j = i + 1; j < len; j++) {
+                // 每次b都不同
+                if (j > i + 1 && nums[j] == nums[j - 1]) {
+                    continue;
+                }
+                // b+c>target 则左移c
+                while (j < k && nums[j] + nums[k] > target) {
+                    k--;
+                }
+                // 不允许j k 重合
+                if (j == k) {
+                    break;
+                }
+                if (nums[j] + nums[k] == target) {
+                    ArrayList<Integer> integers = new ArrayList<>();
+                    integers.add(nums[i]);
+                    integers.add(nums[j]);
+                    integers.add(nums[k]);
+                    lists.add(integers);
+                }
+            }
+        }
+        return lists;
+    }
+}
+```
+
+# 16 [最接近的三数之和](https://leetcode-cn.com/problems/3sum-closest/)
+15题的升级，加一个找到最接近的数的逻辑
+```java
+public class Solution {
+    public int threeSumClosest(int[] nums, int target) {
+        int len = nums.length;
+        Arrays.sort(nums);
+        int closestNum = nums[0] + nums[1] + nums[2];
+        for (int i = 0; i < len - 2; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int j = i + 1;
+            int k = len - 1;
+            while (j < k) {
+                int currentNum = nums[i] + nums[j] + nums[k];
+                if (currentNum == target) {
+                    return currentNum;
+                }
+                if (Math.abs(currentNum - target) < Math.abs(closestNum - target)) {
+                    closestNum = currentNum;
+                }
+                if (currentNum > target) {
+                    --k;
+                    // 排除相同的c元素，加速运算
+                    while (k > j && nums[k] == nums[k + 1]){
+                        --k;
+                    }
+                } else {
+                    ++j;
+                    while (k > j && nums[j] == nums[j - 1]){
+                        ++j;
+                    }
+                }
+            }
+        }
+        return closestNum;
+    }
+}
+```
+
+17 [电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)
+```java
+
+```
