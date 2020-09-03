@@ -632,7 +632,252 @@ public class Solution {
 }
 ```
 
-17 [电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)
+# 17 [电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)
+回溯递归
 ```java
+public class Solution {
+    public List<String> letterCombinations(String digits) {
+        List<String> combinations = new ArrayList<>();
+        if (digits.length() == 0) {
+            return combinations;
+        }
+        HashMap<Character, String> map = new HashMap<>();
+        map.put('2', "abc");
+        map.put('3', "def");
+        map.put('4', "ghi");
+        map.put('5', "jkl");
+        map.put('6', "mno");
+        map.put('7', "pqrs");
+        map.put('8', "uvw");
+        map.put('9', "xyz");
+        backtrack(combinations, map, digits, 0, new StringBuilder());
+        return combinations;
+    }
 
+    private void backtrack(List<String> combinations, HashMap<Character, String> map, String digits, int index,
+                           StringBuilder combination) {
+        if (index == digits.length()) {
+            combinations.add(combination.toString());
+        } else {
+            char digit = digits.charAt(index);
+            String letters = map.get(digit);
+            for (int i = 0; i < letters.length(); i++) {
+                combination.append(letters.charAt(i));
+                backtrack(combinations, map, digits, index + 1, combination);
+                combination.deleteCharAt(index);
+            }
+        }
+    }
+}
+```
+
+# 18 [四数之和](https://leetcode-cn.com/problems/4sum/)
+```java
+public class Solution {
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        int len = nums.length;
+        Arrays.sort(nums);
+        List<List<Integer>> lists = new ArrayList<>();
+        for (int i = 0; i < len - 3; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]){
+                continue;
+            }
+            for (int j = i + 1; j < len - 2; j++) {
+                if (j > i + 1 && nums[j] == nums[j - 1]){
+                    continue;
+                }
+                int k = j + 1;
+                int l = len - 1;
+                while (k < l){
+                    int sum = nums[i] + nums[j]+ nums[k] + nums[l];
+                    if (sum == target){
+                        ArrayList<Integer> list = new ArrayList<>();
+                        list.add(nums[i]);
+                        list.add(nums[j]);
+                        list.add(nums[k]);
+                        list.add(nums[l]);
+                        lists.add(list);
+                    }
+                    if (sum > target){
+                        --l;
+                        while (l > k && nums[l] == nums[l+1]){
+                            --l;
+                        }
+                    } else {
+                        ++k;
+                        while (l > k && nums[k] == nums[k-1]){
+                            ++k;
+                        }
+                    }
+                }
+            }
+            
+        }
+        return lists;
+    }
+}
+```
+优化
+```java
+public class Solution {
+    // 优化后39ms -> 6ms
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        int len = nums.length;
+        Arrays.sort(nums);
+        List<List<Integer>> lists = new ArrayList<>();
+        for (int i = 0; i < len - 3; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]){
+                continue;
+            }
+            // 优化：如果nums[i]与最大的三个数相加依然小于target，那么这个数可以跳过
+            int maxi1 = nums[i] + nums[len - 1] + nums[len - 2] + nums[len - 3];
+            if (maxi1 < target){
+                continue;
+            }
+            // 优化：如果nums[i]与最小的三个数相加依然大于target，循环可以终止
+            int maxi2 = nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3];
+            if (maxi2 > target){
+                continue;
+            }
+
+            for (int j = i + 1; j < len - 2; j++) {
+                if (j > i + 1 && nums[j] == nums[j - 1]){
+                    continue;
+                }
+                // 优化：如果nums[i],nums[j]与最大的两个数相加依然小于target，那么这个数可以跳过
+                int maxj1 = nums[i] + nums[len - 1] + nums[len - 2] + nums[j];
+                if (maxj1 < target){
+                    continue;
+                }
+                // 优化：如果nums[i]，nums[]与最小的三个数相加依然大于target，循环可以终止
+                int maxj2 = nums[i] + nums[j] + nums[j + 1] + nums[j + 2];
+                if (maxi2 > target){
+                    continue;
+                }
+
+                int k = j + 1;
+                int l = len - 1;
+                while (k < l){
+                    int sum = nums[i] + nums[j]+ nums[k] + nums[l];
+                    if (sum == target){
+                        ArrayList<Integer> list = new ArrayList<>();
+                        list.add(nums[i]);
+                        list.add(nums[j]);
+                        list.add(nums[k]);
+                        list.add(nums[l]);
+                        lists.add(list);
+                    }
+                    if (sum > target){
+                        --l;
+                        while (l > k && nums[l] == nums[l+1]){
+                            --l;
+                        }
+                    } else {
+                        ++k;
+                        while (l > k && nums[k] == nums[k-1]){
+                            ++k;
+                        }
+                    }
+                }
+            }
+            
+        }
+        return lists;
+    }
+}
+```
+
+# 19 [删除链表的倒数第N个节点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
+两次遍历
+```java
+public class Solution {
+    /**
+     * Definition for singly-linked list.
+     * public class ListNode {
+     * int val;
+     * ListNode next;
+     * ListNode(int x) { val = x; }
+     * }
+     */
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode first = new ListNode(0);
+        first.next = head;
+        ListNode node = head;
+        int len = 0;
+         while (node != null){
+             len++;
+             node = node.next;
+         }
+         node = first;
+        for (int i = 0; i < len - n ; i++) {
+            node = node.next;
+        }
+        node.next = node.next.next;
+        return first.next;
+
+    }
+
+}
+```
+一次遍历
+```java
+public class Solution {
+    /**
+     * Definition for singly-linked list.
+     * public class ListNode {
+     * int val;
+     * ListNode next;
+     * ListNode(int x) { val = x; }
+     * }
+     */
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode first = new ListNode(0);
+        first.next = head;
+        int len = 0;
+        ListNode node1 = first;
+        ListNode node2 = first;
+        for (int i = 0; i <= n; i++) {
+            node1 = node1.next;
+        }
+        while (node1 != null) {
+            node1 = node1.next;
+            node2 = node2.next;
+        }
+        node2.next = node2.next.next;
+        return first.next;
+    }
+}
+```
+
+# 20 [有效的括号](https://leetcode-cn.com/problems/valid-parentheses/)
+```java
+public class Solution20 {
+    public boolean isValid(String s) {
+        int len = s.length();
+        if (len == 0) {
+            return true;
+        }
+        if ((len % 2) == 1) {
+            return false;
+        }
+        Stack<Character> stack = new Stack<>();
+        HashMap<Character, Character> map = new HashMap<>();
+        map.put(')', '(');
+        map.put(']', '[');
+        map.put('}', '{');
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (map.containsKey(c)) {
+                if (stack.isEmpty() || !stack.peek().equals(map.get(c))) {
+                    return false;
+                }
+                stack.pop();
+
+            } else {
+                stack.push(c);
+            }
+        }
+        return stack.isEmpty();
+    }
+}
 ```
