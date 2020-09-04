@@ -103,7 +103,7 @@ public class Solution {
     }
 }
 ```
-双向BFS
+双向BFS 96ms -> 28ms
 ```java
 class Solution {
     public int openLock(String[] deadends, String target) {
